@@ -13,7 +13,7 @@
             "normalized": true
         },
         {
-            "id": 0,
+            "id": 50257,
             "content": "[UNK]",
             "single_word": false,
             "lstrip": false,
@@ -22,7 +22,7 @@
             "special": true
         },
         {
-            "id": 1,
+            "id": 50258,
             "content": "[PAD]",
             "single_word": false,
             "lstrip": false,
@@ -31,7 +31,7 @@
             "special": true
         },
         {
-            "id": 2,
+            "id": 50259,
             "content": "[SOS]",
             "single_word": false,
             "lstrip": false,
@@ -40,7 +40,7 @@
             "special": true
         },
         {
-            "id": 3,
+            "id": 50260,
             "content": "[EOS]",
             "single_word": false,
             "lstrip": false,
