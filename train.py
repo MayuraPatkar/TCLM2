@@ -1,22 +1,18 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, random_split
 import warnings
 import os
 import sys
-import json
 from pathlib import Path
 from model import build_transformer
 from config import get_config
 from tqdm import tqdm
-from tokenizer import build_or_get_tokenizer
 from torch.utils.tensorboard import SummaryWriter
-import torchmetrics
 from datapipeline import get_ds, causal_mask
 
-def greedy_decode(model, source, source_mask, tokenizer_src, tokenizer_tgt, max_len, device):
-    sos_idx = tokenizer_tgt.token_to_id('[SOS]')
-    eos_idx = tokenizer_tgt.token_to_id('[EOS]')
+def greedy_decode(model, source, source_mask, tokenizer, max_len, device):
+    sos_idx = tokenizer.token_to_id('[SOS]')
+    eos_idx = tokenizer.token_to_id('[EOS]')
 
     encoder_output = model.encode(source, source_mask)
     decoder_input = torch.empty(1, 1).fill_(sos_idx).type_as(source).to(device)
@@ -39,12 +35,11 @@ def greedy_decode(model, source, source_mask, tokenizer_src, tokenizer_tgt, max_
     return decoder_input.squeeze(0)
 
 
-def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, device, print_msg, global_step, writer, num_examples=2):
+def run_validation(model, validation_ds, tokenizer, max_len, device, print_msg, global_step, writer, num_examples=2):
     model.eval()
     count = 0
 
     source_texts = []
-    expected = []
     predicted = []
 
     console_width = 80
@@ -57,40 +52,22 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
 
             assert encoder_input.size(0) == 1, "Batch size must be 1 for validation"
 
-            model_out = greedy_decode(model, encoder_input, encoder_mask, tokenizer_src, tokenizer_tgt, max_len, device)
+            model_out = greedy_decode(model, encoder_input, encoder_mask, tokenizer, max_len, device)
 
-            source_text = batch["src_text"][0]
-            target_text = batch["tgt_text"][0]
-            model_out_text = tokenizer_tgt.decode(model_out.detach().cpu().numpy())
+            source_text = batch["text"][0]
+            model_out_text = tokenizer.decode(model_out.detach().cpu().numpy())
 
             source_texts.append(source_text)
-            expected.append(target_text)
             predicted.append(model_out_text)
             
             print_msg('-'*console_width)
             print_msg(f"{f'SOURCE: ':>12}{source_text}")
-            print_msg(f"{f'TARGET: ':>12}{target_text}")
+            print_msg(f"{f'model out: ':>12}{model_out}")
             print_msg(f"{f'PREDICTED: ':>12}{model_out_text}")
 
             if count == num_examples:
                 print_msg('-'*console_width)
                 break
-    
-    if writer:
-        metric = torchmetrics.CharErrorRate()
-        cer = metric(predicted, expected)
-        writer.add_scalar('validation cer', cer, global_step)
-        writer.flush()
-
-        metric = torchmetrics.WordErrorRate()
-        wer = metric(predicted, expected)
-        writer.add_scalar('validation wer', wer, global_step)
-        writer.flush()
-
-        metric = torchmetrics.BLEUScore()
-        bleu = metric(predicted, expected)
-        writer.add_scalar('validation BLEU', bleu, global_step)
-        writer.flush() 
 
 def get_weights_file_path(config):
     model_file_path = config.get('model_file_path', '')
@@ -163,6 +140,7 @@ def train(config):
             optimizer.zero_grad(set_to_none=True)
 
             
+        print(f"Totoal Loss: {total_loss}")
         global_step += 1
         # Log the loss
         writer.add_scalar('train loss', total_loss, global_step)
@@ -174,7 +152,7 @@ def train(config):
         run_validation(model, val_dataloader, tokenizer, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step, writer)
 
 
-        model_filename = "M68.pt"
+        model_filename = "T-CLM.pt"
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),

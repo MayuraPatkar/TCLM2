@@ -4,6 +4,15 @@
     "padding": null,
     "added_tokens": [
         {
+            "id": 50256,
+            "special": true,
+            "content": "<|endoftext|>",
+            "single_word": false,
+            "lstrip": false,
+            "rstrip": false,
+            "normalized": true
+        },
+        {
             "id": 0,
             "content": "[UNK]",
             "single_word": false,
@@ -50319,7 +50328,11 @@
             "ĠCollider": 50253,
             "Ġinformants": 50254,
             "Ġgazed": 50255,
-            "<|endoftext|>": 50256
+            "<|endoftext|>": 50256,
+            "[UNK]": 50257,
+            "[PAD]": 50258,
+            "[SOS]": 50259,
+            "[EOS]": 50260
         },
         "merges": [
             "Ġ t",

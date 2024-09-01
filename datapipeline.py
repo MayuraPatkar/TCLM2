@@ -47,12 +47,12 @@ class BilingualDataset(Dataset):
         )
 
         # Debug prints
-        print(f"Text: {text}")
-        print(f"Input tokens length: {len(input_tokens)}")
-        print(f"Num padding tokens: {num_padding_tokens}")
-        print(f"Encoder input size: {encoder_input.size(0)}")
-        print(f"Label size: {label.size(0)}")
-        print("="*50)
+        # print(f"Text: {text}")
+        # print(f"Input tokens length: {len(input_tokens)}")
+        # print(f"Num padding tokens: {num_padding_tokens}")
+        # print(f"Encoder input size: {encoder_input.size(0)}")
+        # print(f"Label size: {label.size(0)}")
+        # print("="*50)
 
         assert encoder_input.size(0) == self.seq_len
         assert label.size(0) == self.seq_len
@@ -61,6 +61,7 @@ class BilingualDataset(Dataset):
             "encoder_input": encoder_input,
             "label": label,
             "encoder_mask": (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(),
+            "text": text,
         }
 
 
@@ -70,7 +71,7 @@ def causal_mask(size):
     return mask == 0
 
 def get_ds(config):
-    with open('dataset.json', 'r', encoding='utf-8') as f:
+    with open('dataset-mini.json', 'r', encoding='utf-8') as f:
         ds_raw = json.load(f)
 
     tokenizer = build_or_get_tokenizer(config, ds_raw)
