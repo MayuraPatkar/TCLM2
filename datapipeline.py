@@ -4,6 +4,9 @@ import json
 from tokenizer import build_or_get_tokenizer
 from torch.utils.data import Dataset
 
+from datasets import load_dataset
+from config import get_config
+
 class BilingualDataset(Dataset):
     def __init__(self, ds, tokenizer, seq_len):
         self.seq_len = seq_len
@@ -47,12 +50,12 @@ class BilingualDataset(Dataset):
         )
 
         # Debug prints
-        # print(f"Text: {text}")
-        # print(f"Input tokens length: {len(input_tokens)}")
-        # print(f"Num padding tokens: {num_padding_tokens}")
-        # print(f"Encoder input size: {encoder_input.size(0)}")
-        # print(f"Label size: {label.size(0)}")
-        # print("="*50)
+        print(f"Text: {text}")
+        print(f"Input tokens length: {len(input_tokens)}")
+        print(f"Num padding tokens: {num_padding_tokens}")
+        print(f"Encoder input size: {encoder_input.size(0)}")
+        print(f"Label size: {label.size(0)}")
+        print("="*50)
 
         assert encoder_input.size(0) == self.seq_len
         assert label.size(0) == self.seq_len
@@ -71,8 +74,10 @@ def causal_mask(size):
     return mask == 0
 
 def get_ds(config):
-    with open('dataset-mini.json', 'r', encoding='utf-8') as f:
-        ds_raw = json.load(f)
+    # with open('dataset-mini.json', 'r', encoding='utf-8') as f:
+    #     ds_raw = json.load(f)
+
+    ds_raw = load_dataset(f"bookcorpus/bookcorpus", f"plain_text", split='train', trust_remote_code=True)
 
     tokenizer = build_or_get_tokenizer(config, ds_raw)
     train_ds_size = int(0.95 * len(ds_raw))
@@ -88,3 +93,6 @@ def get_ds(config):
     return train_dataloader, val_dataloader, tokenizer
 
 
+# if __name__ == '__main__':
+#     config = get_config()
+#     get_ds(config)
