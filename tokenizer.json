@@ -47,6 +47,15 @@
             "rstrip": false,
             "normalized": false,
             "special": true
+        },
+        {
+            "id": 50261,
+            "content": "[MASK]",
+            "single_word": false,
+            "lstrip": false,
+            "rstrip": false,
+            "normalized": false,
+            "special": true
         }
     ],
     "normalizer": null,
@@ -50332,7 +50341,8 @@
             "[UNK]": 50257,
             "[PAD]": 50258,
             "[SOS]": 50259,
-            "[EOS]": 50260
+            "[EOS]": 50260,
+            "[MASK]": 50261
         },
         "merges": [
             "Ġ t",
