@@ -155,10 +155,8 @@ class TCLM(nn.Module):
         x = self.decoder(x, tgt_mask)
 
         logits = self.projection_layer(x)
-
+ 
         if targets is not None:
-            logits = logits[:, :-1, :].contiguous()
-            targets = targets[:, 1:].contiguous()
             logits = logits.view(-1, logits.size(-1))
             targets = targets.view(-1)
             loss = F.cross_entropy(logits, targets)
@@ -167,13 +165,30 @@ class TCLM(nn.Module):
 
         return logits, loss
 
-    def generate(self, idx: torch.Tensor, max_new_tokens: int, seq_len: int):
+    def generate(self, idx: torch.Tensor, max_new_tokens: int, seq_len: int, temperature: float = 1.0, top_k: int = 10):
+        vocab_size = self.projection_layer.proj.out_features
         for _ in range(max_new_tokens):
-            idx_crop = idx[:, -seq_len:]
+
+            if idx.size(1) > seq_len:
+                idx_crop = idx[:, -seq_len:]
+            else:
+                idx_crop = idx
+
+            # Forward pass through the model
             logits, _ = self.forward(idx_crop)
-            logits = logits[:, -1, :]
+            logits = logits[:, -1, :]  # logits for the last token in the sequence
+
+            logits = logits / temperature
             probs = F.softmax(logits, dim=-1)
-            idx_next = torch.multinomial(probs, num_samples=1)
+
+            top_k = min(top_k, vocab_size)
+            top_k_probs, top_k_indices = torch.topk(probs, top_k, dim=-1)
+        
+            top_k_probs = top_k_probs / top_k_probs.sum(dim=-1, keepdim=True)
+            idx_next = top_k_indices.gather(-1, torch.multinomial(top_k_probs, 1))
+
             idx = torch.cat((idx, idx_next), dim=1)
 
         return idx
+
+

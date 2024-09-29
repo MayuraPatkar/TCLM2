@@ -59,8 +59,6 @@ def get_ds(config):
     with open('dataset.json', 'r', encoding='utf-8') as f:
         ds_raw = json.load(f)
 
-    # ds_raw = load_dataset(f"bookcorpus/bookcorpus", f"plain_text", split='train', trust_remote_code=True)
-
     tokenizer = build_or_get_tokenizer(config, ds_raw)
     train_ds_size = int(0.99 * len(ds_raw))
     val_ds_size = len(ds_raw) - train_ds_size

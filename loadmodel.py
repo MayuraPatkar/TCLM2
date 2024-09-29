@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 
-def load_model(config, device, model, tokenizer, optimizer):
+def load_model(config, device, model, optimizer):
     initial_epoch = 0
     global_step = 0
     model = model.to(device)

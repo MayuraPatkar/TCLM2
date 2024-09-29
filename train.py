@@ -26,7 +26,7 @@ def train(config):
     # wandb.watch(model, log="all")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=config['lr'], eps=1e-9)
-    model, initial_epoch, global_step = load_model(config, device, model, tokenizer, optimizer)
+    model, initial_epoch, global_step = load_model(config, device, model, optimizer)
 
     for epoch in range(initial_epoch, config['num_epochs']):
         torch.cuda.empty_cache()
@@ -85,7 +85,7 @@ def validate(model, val_dataloader, device, epoch):
             total_val_loss += val_loss.item()
 
     avg_val_loss = total_val_loss / num_batches
-    print(f"Validation Loss (Epoch {epoch}): {avg_val_loss}")
+    print(f"Validation Loss (Epoch {epoch}): {round(avg_val_loss, 2)}")
 
     # Log validation loss to wandb
     # wandb.log({"validation_loss": avg_val_loss, "epoch": epoch})
