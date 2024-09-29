@@ -36,8 +36,8 @@ def train(config):
         num_batches = len(train_dataloader)
 
         for batch in batch_iterator:
-            encoder_input = batch['input'].to(device)
-            targets = batch['label'].to(device)
+            encoder_input = batch['inputs'].to(device)
+            targets = batch['targets'].to(device)
 
             optimizer.zero_grad()  # Reset gradients
             logits, loss = model(encoder_input, targets=targets)
@@ -79,8 +79,8 @@ def validate(model, val_dataloader, device, epoch):
 
     with torch.no_grad():
         for batch in val_dataloader:
-            encoder_input = batch['input'].to(device)
-            targets = batch['label'].to(device)
+            encoder_input = batch['inputs'].to(device)
+            targets = batch['targets'].to(device)
             logits, val_loss = model(encoder_input, targets=targets)
             total_val_loss += val_loss.item()
 

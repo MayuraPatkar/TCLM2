@@ -11,11 +11,11 @@ def get_config():
         "head": 12,
         "d_ff": 3072,
         "dropout": 0.1,
-        "masking_prob": 0.15,
         "temperature": 2.0,
         "top_k": 2900,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "model_file_path": "T-CLM2.pt",
-        "tokenizer_file": "tokenizer.json",
+        "dataset_file_path": "dataset.json",
+        "tokenizer_file_path": "tokenizer.json",
         "logs": "/T-CLM-logs",
     }

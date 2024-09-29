@@ -6,7 +6,7 @@ def get_all_sentences(ds, field):
         yield item[field]
 
 def build_or_get_tokenizer(config, ds):
-    tokenizer_path = Path(config['tokenizer_file'])
+    tokenizer_path = Path(config['tokenizer_file_path'])
     if not tokenizer_path.exists():
         tokenizer = Tokenizer(models.BPE(unk_token="[UNK]"))
         tokenizer.pre_tokenizer = pre_tokenizers.Whitespace()

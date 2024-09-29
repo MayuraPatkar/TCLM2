@@ -26,7 +26,7 @@ class BilingualDataset(Dataset):
 
         num_padding_tokens = self.seq_len - len(input_tokens) - 2
 
-        input = torch.cat(
+        inputs = torch.cat(
             [
                 self.sos_token,
                 torch.tensor(input_tokens, dtype=torch.int64),
@@ -37,7 +37,7 @@ class BilingualDataset(Dataset):
         )
 
         # The label is shifted right by one
-        label = torch.cat(
+        labels = torch.cat(
             [
                 torch.tensor(input_tokens, dtype=torch.int64),
                 self.eos_token,
@@ -46,17 +46,16 @@ class BilingualDataset(Dataset):
             dim=0,
         )
 
-        assert input.size(0) == self.seq_len
-        assert label.size(0) == self.seq_len
+        assert inputs.size(0) == self.seq_len
+        assert labels.size(0) == self.seq_len
 
         return {
-            "input": input,
-            "label": label,
-            "text": text,
+            "inputs": inputs,
+            "targets": labels,
         }
 
 def get_ds(config):
-    with open('dataset.json', 'r', encoding='utf-8') as f:
+    with open(config['dataset_file_path'], 'r', encoding='utf-8') as f:
         ds_raw = json.load(f)
 
     tokenizer = build_or_get_tokenizer(config, ds_raw)
