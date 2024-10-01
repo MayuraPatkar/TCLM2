@@ -26,6 +26,6 @@ while True:
 
     idx = tokenizer.encode(text).ids
     idx = torch.tensor([idx]).to(config['device'])
-    generated_sequence = model.generate(idx, max_new_tokens=10, seq_len=config['seq_len'], temperature=config['temperature'], top_k=config['top_k'])
+    generated_sequence = model.generate(idx, max_new_tokens=20, seq_len=config['seq_len'], temperature=config['temperature'], top_k=config['top_k'])
     predicted_text = tokenizer.decode(generated_sequence[0].cpu().numpy())
     print("predicted:", predicted_text)
